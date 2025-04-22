@@ -17,6 +17,12 @@ app.use(cors({
   credentials: true,
 }));
 
+
+app.get('/test', (req, res) => {
+  res.json({ message: 'Dummy endpoint is working!' });
+});
+
+
 // Routes
 app.use('/upload', uploadRoutes);
 
