@@ -3,10 +3,26 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
+
+const serviceAccountPath = path.resolve(__dirname, '..', 'service-account.json');
+
+// Create file from base64 env var if it doesn't exist
+if (!fs.existsSync(serviceAccountPath) && process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+  const decoded = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf8');
+  fs.writeFileSync(serviceAccountPath, decoded);
+}
+
 const auth = new google.auth.GoogleAuth({
-  keyFile: path.resolve(__dirname, '..', process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
+  keyFile: serviceAccountPath,
   scopes: ['https://www.googleapis.com/auth/drive'],
 });
+
+
+
+// const auth = new google.auth.GoogleAuth({
+//   keyFile: path.resolve(__dirname, '..', process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
+//   scopes: ['https://www.googleapis.com/auth/drive'],
+// });
 
 const drive = google.drive({ version: 'v3', auth });
 
