@@ -50,24 +50,14 @@ async function createFolder(name, parentId) {
   return folder.data.id;
 }
 
-async function uploadToDrive(filePath, fileName, rootFolderId, clinicianName) {
+async function uploadToDrive(filePath, fileName, folderId) {
   if (!fs.existsSync(filePath)) throw new Error('File path does not exist.');
-  if (!rootFolderId) throw new Error('Missing Google Drive root folder ID.');
+  if (!folderId) throw new Error('Missing Google Drive folder ID.');
 
-  const cleanName = clinicianName?.trim().replace(/\s+/g, '_') || 'Unknown';
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
-
-  // Step 1: Get or create clinician folder
-  const clinicianFolderId = await createFolder(cleanName, rootFolderId);
-
-  // Step 2: Get or create timestamp folder
-  const timestampFolderId = await createFolder(timestamp, clinicianFolderId);
-
-  // Step 3: Upload file to timestamp folder
-  const finalName = `${fileName.replace(/\s+/g, '_')}`;
+  const finalName = fileName.replace(/\s+/g, '_');
   const fileMetadata = {
     name: finalName,
-    parents: [timestampFolderId],
+    parents: [folderId],
   };
 
   const media = {
@@ -84,4 +74,7 @@ async function uploadToDrive(filePath, fileName, rootFolderId, clinicianName) {
   return response.data;
 }
 
-module.exports = { uploadToDrive };
+module.exports = {
+  uploadToDrive,
+  createFolder, // <-- add this line
+};
